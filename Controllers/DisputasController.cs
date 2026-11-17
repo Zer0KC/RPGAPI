@@ -78,9 +78,9 @@ namespace RpgApi.Controllers
                 return Ok(d);
             }
             catch (Exception ex)
-            {
-                return BadRequest(new { message = $"Erro ao processar a disputa: {ex.Message}" });
-            }
+                {
+                    return BadRequest(new { message = "Erro ao processar a disputa: " + (ex.InnerException?.Message ?? ex.Message) });
+                }
         }
 
         [HttpPost("Habilidade")]
