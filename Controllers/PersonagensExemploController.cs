@@ -30,15 +30,6 @@ namespace RpgApi.Controllers
         {
             return Ok(personagens);
         }
-
-
-
-
-
-
-
-
-
-
+        
     }
 }

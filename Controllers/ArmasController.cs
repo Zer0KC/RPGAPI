@@ -70,6 +70,14 @@ namespace RpgApi.Controllers
                 if (p == null)
                     throw new Exception("Não existe personagem com o Id informado");
 
+                // (A) Busca na tabela de armas uma arma com o Id de personagem informado
+                Arma buscaArma = await _context.TB_ARMAS
+                    .FirstOrDefaultAsync(a => a.PersonagemId == novaArma.PersonagemId);
+
+                // (B) Se achou, o personagem não pode ter mais de uma arma (relacionamento 1 para 1)
+                if (buscaArma != null)
+                    throw new Exception("O personagem selecionado já possui uma arma atribuída a ele.");
+
                 await _context.TB_ARMAS.AddAsync(novaArma);
 
                 await _context.SaveChangesAsync();

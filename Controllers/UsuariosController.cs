@@ -128,5 +128,126 @@ public async Task<IActionResult> AutenticarUsuario(Usuario credenciais)
                 return BadRequest(ex.Message);
             }
         }
+
+        // ---------------------------------------------------------------
+        // Métodos complementares - Aula 14-02
+        // ---------------------------------------------------------------
+
+        // Buscar usuário por Id
+        [HttpGet("{usuarioId}")]
+        public async Task<IActionResult> GetUsuario(int usuarioId)
+        {
+            try
+            {
+                Usuario? usuario = await _context.TB_USUARIOS //Busca o usuário no banco através do Id
+                    .FirstOrDefaultAsync(x => x.Id == usuarioId);
+
+                return Ok(usuario);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // Buscar usuário por login
+        [HttpGet("GetByLogin/{login}")]
+        public async Task<IActionResult> GetUsuario(string login)
+        {
+            try
+            {
+                Usuario? usuario = await _context.TB_USUARIOS //Busca o usuário no banco através do login
+                    .FirstOrDefaultAsync(x => x.Username.ToLower() == login.ToLower());
+
+                return Ok(usuario);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //Método para alteração da geolocalização
+        [HttpPut("AtualizarLocalizacao")]
+        public async Task<IActionResult> AtualizarLocalizacao(Usuario u)
+        {
+            try
+            {
+                Usuario? usuario = await _context.TB_USUARIOS //Busca o usuário no banco através do Id
+                    .FirstOrDefaultAsync(x => x.Id == u.Id);
+
+                if (usuario == null)
+                    throw new System.Exception("Usuário não encontrado.");
+
+                usuario.Latitude = u.Latitude;
+                usuario.Longitude = u.Longitude;
+
+                var attach = _context.Attach(usuario);
+                attach.Property(x => x.Id).IsModified = false;
+                attach.Property(x => x.Latitude).IsModified = true;
+                attach.Property(x => x.Longitude).IsModified = true;
+
+                int linhasAfetadas = await _context.SaveChangesAsync(); //Confirma a alteração no banco
+                return Ok(linhasAfetadas); //Retorna as linhas afetadas (Geralmente sempre 1 linha msm)
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //Método para alteração do e-mail
+        [HttpPut("AtualizarEmail")]
+        public async Task<IActionResult> AtualizarEmail(Usuario u)
+        {
+            try
+            {
+                Usuario? usuario = await _context.TB_USUARIOS //Busca o usuário no banco através do Id
+                    .FirstOrDefaultAsync(x => x.Id == u.Id);
+
+                if (usuario == null)
+                    throw new System.Exception("Usuário não encontrado.");
+
+                usuario.Email = u.Email;
+
+                var attach = _context.Attach(usuario);
+                attach.Property(x => x.Id).IsModified = false;
+                attach.Property(x => x.Email).IsModified = true;
+
+                int linhasAfetadas = await _context.SaveChangesAsync(); //Confirma a alteração no banco
+                return Ok(linhasAfetadas); //Retorna as linhas afetadas (Geralmente sempre 1 linha msm)
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //Método para alteração da foto
+        [HttpPut("AtualizarFoto")]
+        public async Task<IActionResult> AtualizarFoto(Usuario u)
+        {
+            try
+            {
+                Usuario? usuario = await _context.TB_USUARIOS
+                    .FirstOrDefaultAsync(x => x.Id == u.Id);
+
+                if (usuario == null)
+                    throw new System.Exception("Usuário não encontrado.");
+
+                usuario.Foto = u.Foto;
+
+                var attach = _context.Attach(usuario);
+                attach.Property(x => x.Id).IsModified = false;
+                attach.Property(x => x.Foto).IsModified = true;
+
+                int linhasAfetadas = await _context.SaveChangesAsync();
+                return Ok(linhasAfetadas);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
