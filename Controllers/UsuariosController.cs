@@ -75,6 +75,10 @@ public async Task<IActionResult> AutenticarUsuario(Usuario credenciais)
                 }
                 else
                 {
+                    usuario.DataAcesso = System.DateTime.Now;
+                    _context.TB_USUARIOS.Update(usuario);
+                    await _context.SaveChangesAsync(); //Confirma a alteração no banco
+
                     return Ok(usuario);
                 }
             }
@@ -110,6 +114,19 @@ public async Task<IActionResult> AutenticarUsuario(Usuario credenciais)
                 return BadRequest(ex.Message + " - " + ex.InnerException);
             }
         }
-        
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetUsuarios()
+        {
+            try
+            {
+                List<Usuario> lista = await _context.TB_USUARIOS.ToListAsync();
+                return Ok(lista);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

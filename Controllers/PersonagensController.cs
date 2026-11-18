@@ -25,7 +25,11 @@ namespace RpgApi.Controllers
         {
             try
             {
-                Personagem p = await _context.TB_PERSONAGENS                                 
+                Personagem p = await _context.TB_PERSONAGENS
+                    .Include(ar => ar.Arma) //Inclui na propriedade Arma do objeto p
+                    .Include(us => us.Usuario) //Inclui na propriedade Usuario do objeto p
+                    .Include(ph => ph.PersonagemHabilidades)
+                        .ThenInclude(h => h.Habilidade) //Inclui na lista de PersonagemHabilidades bilidad                   
                     .FirstOrDefaultAsync(pBusca => pBusca.Id == id);
 
                 return Ok(p);
@@ -105,6 +109,28 @@ namespace RpgApi.Controllers
                 return BadRequest(ex.Message + " - " + ex.InnerException);
             }
         }
+
+        [HttpPost("DeletePersonagemHabilidade")]
+            public async Task<IActionResult> DeleteAsync(PersonagemHabilidade ph)
+            {
+            
+                try
+                {
+                    PersonagemHabilidade? phRemover = await _context.TB_PERSONAGENS_HABILIDADES
+                        .FirstOrDefaultAsync(phBusca => phBusca.PersonagemId == ph.PersonagemId
+                        && phBusca.HabilidadeId == ph.HabilidadeId); 
+                    if (phRemover == null)
+                        throw new System.Exception("Personagem ou habilidade não encontrado.");
+
+                    _context.TB_PERSONAGENS_HABILIDADES.Remove(phRemover);
+                    int linhasAfetadas = await _context.SaveChangesAsync();
+                    return Ok(linhasAfetadas);
+                }
+                catch (System.Exception ex)
+                {
+                    return BadRequest(ex.Message + " - " + ex.InnerException);
+                }
+            }
 
     }
 }
